@@ -30,7 +30,7 @@ def predict_cost(input_dict, model):
     df['bmi'] = df['bmi'].clip(lower=15, upper=47)
 
     encoded = oh_encoder.transform(df[['region']])
-    encoded_df = pd.DataFrame(encoded.toarray(), columns=["northeast", "northwest", "southeast", "southwest"])
+    encoded_df = pd.DataFrame(encoded.toarray(), columns=['northeast', 'northwest', 'southeast', 'southwest'])
     df = pd.concat([df, encoded_df], axis=1).drop(columns='region')
     
     df[['age', 'bmi']] = scaler_x.transform(df[['age', 'bmi']])
@@ -50,3 +50,24 @@ if st.button("Predict Cost"):
     }
     cost = predict_cost(input_data, model)
     st.success(f"Estimated Medical Cost: ${cost:,.2f}")
+
+    # Prepare report
+    report = (
+        "----- Medical Cost Prediction Report -----\n"
+        f"Age: {age}\n"
+        f"Sex: {sex}\n"
+        f"BMI: {bmi}\n"
+        f"Children: {children}\n"
+        f"Smoker: {smoker}\n"
+        f"Region: {region}\n"
+        f"------------------------------------------\n"
+        f"Estimated Medical Cost: ${cost:,.2f}\n"
+    )
+
+    # Download button
+    st.download_button(
+        label="📥 Download Report",
+        data=report,
+        file_name="medical_cost_report.txt",
+        mime="text/plain"
+    )
